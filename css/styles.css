@@ -1,0 +1,42 @@
+/* Element selector */
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+h1 {
+    color: #1a1a2e;
+}
+
+h2 {
+    color: #444;
+    border-bottom: 2px solid #e94560;
+    padding-bottom: 8px;
+}
+
+/* ID selector */
+#main-title {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+/* Class selector */
+.section {
+    margin-bottom: 30px;
+}
+
+/* Hover pseudo-class */
+a:hover {
+    color: #e94560;
+    text-decoration: underline;
+}
+
+button:hover {
+    background-color: #e94560;
+    color: white;
+    cursor: pointer;
+}
