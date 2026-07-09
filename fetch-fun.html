@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fetch Fun</title>
+</head>
+<body>
+  <h1>Random Programming Joke</h1>
+  <button id="jokeBtn">Get a joke</button>
+  <button id="surpriseBtn">Surprise me</button>
+  <p id="output"></p>
+
+  <script>
+    async function getJoke() {
+      try {
+        const response = await fetch("https://v2.jokeapi.dev/joke/Programming?type=single");
+        const data = await response.json();
+        document.getElementById("output").textContent = data.joke;
+      } catch (error) {
+        document.getElementById("output").textContent = "Something went wrong.";
+      }
+    }
+
+    async function getSurprise() {
+      try {
+        const useJoke = Math.random() < 0.5;
+        const url = useJoke
+          ? "https://v2.jokeapi.dev/joke/Programming?type=single"
+          : "https://api.adviceslip.com/advice";
+        const response = await fetch(url);
+        const data = await response.json();
+        document.getElementById("output").textContent = useJoke ? data.joke : data.slip.advice;
+      } catch (error) {
+        document.getElementById("output").textContent = "Something went wrong.";
+      }
+    }
+
+    document.getElementById("jokeBtn").addEventListener("click", getJoke);
+    document.getElementById("surpriseBtn").addEventListener("click", getSurprise);
+  </script>
+</body>
+</html>
