@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Reading Time Estimator",
+  "version": "1.0",
+  "description": "Shows an estimated reading time banner at the top of article pages.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

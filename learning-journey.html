@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Journey - Sultan Abuissa</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/theme.js"></script>
     <style>
         body { max-width: 900px; }
 
@@ -141,9 +142,45 @@
             color: #333;
             line-height: 1.6;
         }
+
+        /* ---- Dark mode overrides for this page's custom elements ---- */
+        [data-theme="dark"] .timeline {
+            border-left-color: #3a3a4a;
+        }
+
+        [data-theme="dark"] .week::before {
+            border-color: #14141f;
+        }
+
+        [data-theme="dark"] .week-num {
+            color: #f5f5f5;
+        }
+
+        [data-theme="dark"] .legend {
+            color: #bbb;
+        }
+
+        [data-theme="dark"] .compare .col {
+            background: #20202f;
+            border-color: #3a3a4a;
+        }
+
+        [data-theme="dark"] .compare .col.after {
+            border-color: #e94560;
+        }
+
+        [data-theme="dark"] .compare .col h3,
+        [data-theme="dark"] .compare .col p {
+            color: #e8e8e8;
+        }
+
+        [data-theme="dark"] .closing {
+            color: #ddd;
+        }
     </style>
 </head>
 <body>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
     <h1 id="main-title">My Learning Journey</h1>
     <p style="color:#666; margin-top:-8px;">OIM3690 — Sultan Abuissa</p>
 

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Filters</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      canvas {
+        border: 1px solid #ccc;
+        margin: 10px;
+      }
+      button {
+        padding: 8px 16px;
+        margin: 5px;
+        font-size: 1em;
+        cursor: pointer;
+      }
+      #rgb-info {
+        display: inline-block;
+        padding: 8px 16px;
+        min-width: 200px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Image Filters</h1>
+    <p><input type="file" id="upload" accept="image/*" /> Pick any image</p>
+    <div>
+      <canvas id="original-canvas"></canvas>
+      <canvas id="filtered-canvas"></canvas>
+    </div>
+    <div>
+      <button id="btn-red">Red Filter</button>
+      <button id="btn-gray">Grayscale</button>
+      <button id="btn-negative">Negative</button>
+      <button id="btn-brightness">Brightness</button>
+      <button id="btn-blur">Blur</button>
+    </div>
+    <h2 id="rgb-info"></h2>
+
+    <script>
+      const image = new Image();
+
+      const upload = document.getElementById("upload");
+      const originalCanvas = document.getElementById("original-canvas");
+      const filteredCanvas = document.getElementById("filtered-canvas");
+      const originalCtx = originalCanvas.getContext("2d");
+      const filteredCtx = filteredCanvas.getContext("2d");
+      const rgbInfo = document.getElementById("rgb-info");
+
+      // Load any image the student picks (FileReader turns it into a data URL)
+      upload.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+          image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // When the image loads, draw it on the original canvas
+      image.onload = function () {
+        // Scale large photos down so the canvas fits the page and stays fast
+        const maxSize = 400;
+        const scale = Math.min(1, maxSize / image.width, maxSize / image.height);
+        const w = Math.round(image.width * scale);
+        const h = Math.round(image.height * scale);
+
+        originalCanvas.width = w;
+        originalCanvas.height = h;
+        filteredCanvas.width = w;
+        filteredCanvas.height = h;
+
+        originalCtx.drawImage(image, 0, 0, w, h);
+      };
+
+      // Color picker: show the RGBA value under the cursor
+      originalCanvas.addEventListener("mousemove", function (event) {
+        const x = event.offsetX;
+        const y = event.offsetY;
+        const pixel = originalCtx.getImageData(x, y, 1, 1);
+        const d = pixel.data;
+
+        const rgba = `rgba(${d[0]}, ${d[1]}, ${d[2]}, ${(d[3] / 255).toFixed(2)})`;
+        rgbInfo.style.background = rgba;
+        rgbInfo.textContent = rgba;
+        rgbInfo.style.color = d[0] + d[1] + d[2] < 380 ? "white" : "black";
+      });
+
+      // Helper: draw the image on the filtered canvas and return its pixel data
+      function getFilteredImageData() {
+        filteredCtx.drawImage(image, 0, 0, filteredCanvas.width, filteredCanvas.height);
+        return filteredCtx.getImageData(0, 0, filteredCanvas.width, filteredCanvas.height);
+      }
+
+      // Red filter (working example to learn from)
+      function redFilter() {
+        const imgData = getFilteredImageData();
+        for (let i = 0; i < imgData.data.length; i += 4) {
+          // Keep red (imgData.data[i]), zero out green and blue
+          imgData.data[i + 1] = 0;
+          imgData.data[i + 2] = 0;
+        }
+        filteredCtx.putImageData(imgData, 0, 0);
+      }
+
+      // Grayscale filter
+      function grayscaleFilter() {
+        const imgData = getFilteredImageData();
+        for (let i = 0; i < imgData.data.length; i += 4) {
+          // Average red, green, blue, then set all three to that average
+          const avg = (imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2]) / 3;
+          imgData.data[i] = avg;
+          imgData.data[i + 1] = avg;
+          imgData.data[i + 2] = avg;
+        }
+        filteredCtx.putImageData(imgData, 0, 0);
+      }
+
+      // Negative filter
+      function negativeFilter() {
+        const imgData = getFilteredImageData();
+        for (let i = 0; i < imgData.data.length; i += 4) {
+          // Subtract each color value from 255
+          imgData.data[i] = 255 - imgData.data[i];
+          imgData.data[i + 1] = 255 - imgData.data[i + 1];
+          imgData.data[i + 2] = 255 - imgData.data[i + 2];
+        }
+        filteredCtx.putImageData(imgData, 0, 0);
+      }
+
+      // clamp helper: keep a value in the 0 to 255 range
+      function clamp(v) {
+        return Math.max(0, Math.min(255, v));
+      }
+
+      // Brightness filter
+      function brightnessFilter() {
+        const imgData = getFilteredImageData();
+        const amount = 50;
+        for (let i = 0; i < imgData.data.length; i += 4) {
+          // Add `amount` to each color, wrapped in clamp(...) so values stay 0-255
+          imgData.data[i] = clamp(imgData.data[i] + amount);
+          imgData.data[i + 1] = clamp(imgData.data[i + 1] + amount);
+          imgData.data[i + 2] = clamp(imgData.data[i + 2] + amount);
+        }
+        filteredCtx.putImageData(imgData, 0, 0);
+      }
+
+      // Blur filter
+      // Unlike the filters above, blur needs each pixel's neighbors, not just
+      // itself, so it loops over x/y coordinates instead of a flat i += 4 loop.
+      function blurFilter() {
+        const imgData = getFilteredImageData();
+        const width = imgData.width;
+        const height = imgData.height;
+        const src = imgData.data;
+
+        // Read from a copy of the original pixels so every average is based
+        // on the unblurred image, not on neighbors we've already changed
+        const output = new Uint8ClampedArray(src);
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            let r = 0;
+            let g = 0;
+            let b = 0;
+            let count = 0;
+
+            // Average this pixel with its 8 neighbors (a 3x3 box)
+            for (let dy = -1; dy <= 1; dy++) {
+              for (let dx = -1; dx <= 1; dx++) {
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+
+                const ni = (ny * width + nx) * 4;
+                r += src[ni];
+                g += src[ni + 1];
+                b += src[ni + 2];
+                count++;
+              }
+            }
+
+            const i = (y * width + x) * 4;
+            output[i] = r / count;
+            output[i + 1] = g / count;
+            output[i + 2] = b / count;
+          }
+        }
+
+        imgData.data.set(output);
+        filteredCtx.putImageData(imgData, 0, 0);
+      }
+
+      // Attach the buttons
+      document.getElementById("btn-red").addEventListener("click", redFilter);
+      document.getElementById("btn-gray").addEventListener("click", grayscaleFilter);
+      document.getElementById("btn-negative").addEventListener("click", negativeFilter);
+      document.getElementById("btn-brightness").addEventListener("click", brightnessFilter);
+      document.getElementById("btn-blur").addEventListener("click", blurFilter);
+    </script>
+  </body>
+</html>

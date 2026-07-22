@@ -1,0 +1,19 @@
+/* Banner injected by content.js at the top of the page */
+
+#reading-time-banner {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 16px;
+  background-color: #1a1a2e;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 3px solid #e94560;
+
+  /* Sits above whatever the page itself has, without covering anything
+     since it's inserted in normal flow, not fixed/absolute positioned. */
+  position: relative;
+  z-index: 999999;
+}

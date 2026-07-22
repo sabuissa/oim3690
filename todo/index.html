@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>To-Do List</title>
+  <script src="../js/theme.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,7 +12,28 @@
       margin: 60px auto;
       padding: 0 20px;
       background: #f5f5f5;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
+
+    .theme-toggle {
+      display: block;
+      margin: 0 auto 16px;
+      padding: 6px 14px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+    }
+    .theme-toggle:hover { opacity: 0.85; }
+
+    [data-theme="dark"] body { background: #14141f; color: #e8e8e8; }
+    [data-theme="dark"] h1 { color: #f5f5f5; }
+    [data-theme="dark"] #task-input { background: #20202f; color: #e8e8e8; border-color: #3a3a4a; }
+    [data-theme="dark"] #task-list li { background: #20202f; border-color: #3a3a4a; color: #e8e8e8; }
+    [data-theme="dark"] #task-list li.done span { color: #777; }
+    [data-theme="dark"] .theme-toggle { background: #20202f; color: #e8e8e8; border-color: #3a3a4a; }
 
     h1 {
       text-align: center;
@@ -90,6 +112,7 @@
 </head>
 <body>
 
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
   <h1>To-Do List</h1>
 
   <div class="input-row">
